@@ -25,7 +25,7 @@ else
 fi
 
 echo "> Setting up container proxy"
-KIND_NAME=kind
+KIND_NAME=kup
 SETUP_URL=http://docker-registry-proxy:3128/setup/systemd
 pids=""
 for NODE in $(kind get nodes --name "$KIND_NAME"); do

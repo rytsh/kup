@@ -20,7 +20,19 @@ helm install kube-prometheus-stack \
   --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=4Gi \
   --set grafana.persistence.enabled=true \
   --set grafana.persistence.type=pvc \
-  --set grafana.persistence.size=2Gi
+  --set grafana.persistence.size=2Gi \
+  --set 'grafana.additionalDataSources[0].name=Loki' \
+  --set 'grafana.additionalDataSources[0].type=loki' \
+  --set 'grafana.additionalDataSources[0].url=http://loki:3100' \
+  --set 'grafana.additionalDataSources[0].access=proxy' \
+  --set 'grafana.additionalDataSources[0].isDefault=false' \
+  --set 'grafana.additionalDataSources[1].name=Tempo' \
+  --set 'grafana.additionalDataSources[1].type=tempo' \
+  --set 'grafana.additionalDataSources[1].url=http://tempo:3200' \
+  --set 'grafana.additionalDataSources[1].access=proxy' \
+  --set 'grafana.additionalDataSources[1].isDefault=false' \
+  --set 'grafana.additionalDataSources[1].jsonData.tracesToLogsV2.datasourceUid=Loki' \
+  --set 'grafana.additionalDataSources[1].jsonData.nodeGraph.enabled=true'
   #--set "grafana.adminPassword=awesomepassword"
 
 echo "> [5/10] Add grafana repo"
@@ -32,6 +44,7 @@ echo "> [8/10] Install loki-stack"
 helm install loki \
   --namespace kube-prometheus-stack \
   grafana/loki \
+  --set deploymentMode=SingleBinary \
   --set loki.commonConfig.replication_factor=1 \
   --set loki.storage.type=filesystem \
   --set loki.schemaConfig.configs[0].from="2024-01-01" \
@@ -40,10 +53,13 @@ helm install loki \
   --set loki.schemaConfig.configs[0].schema=v13 \
   --set loki.schemaConfig.configs[0].index.prefix=loki_index_ \
   --set loki.schemaConfig.configs[0].index.period=24h \
+  --set loki.auth_enabled=false \
   --set singleBinary.replicas=1 \
   --set read.replicas=0 \
   --set write.replicas=0 \
-  --set backend.replicas=0
+  --set backend.replicas=0 \
+  --set chunksCache.enabled=false \
+  --set resultsCache.enabled=false
 
 echo "> [9/10] Install tempo"
 helm install tempo \

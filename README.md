@@ -8,6 +8,7 @@ Kubernetes installation guide in WSL.
 - Windows Terminal
 - A Linux distribution installed in WSL
 - Kernel installed `https://github.com/Locietta/xanmod-kernel-WSL2` check `./scripts/kernel/install.sh` for installation instructions.
+- Enable IP forwarding `echo "net.ipv4.ip_forward = 1" | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
 
 All tools are installed in the `~/bin` directory. Make sure to add it to your PATH.
 
@@ -24,13 +25,14 @@ echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
 
 ## Installation
 
-> Delete the cluster with `kind delete cluster` if you want to start over.
+> Delete the cluster with `kind delete cluster -n kup` if you want to start over.
 
 Kind install a Kubernetes cluster with Cilium as the CNI plugin.
 
 ```sh
 kind create cluster --config=configs/kind.yaml
 # kubeconfig file ~/.kube/config.
+kubectl cluster-info --context kind-kup
 ```
 
 Install registry, cilium network and metric server in the cluster.
@@ -57,6 +59,12 @@ kubectl -n kube-gateway get secrets ca -o jsonpath='{.data.tls\.crt}' | base64 -
 
 ## IDE
 
+k9s is a terminal-based Kubernetes IDE.
+
+```sh
+./scripts/tools/k9s.sh
+```
+
 Lens IDE is a popular Kubernetes IDE that provides a graphical interface for managing Kubernetes clusters.
 > https://freelensapp.github.io/
 
@@ -77,3 +85,9 @@ Use `socks5` proxy to access the cluster.
 
 In browser add extension `FoxyProxy` and set proxy for `*.kube.com` to `socks5://localhost:1080`.  
 Also add proxy pattern `*://*.kube.com/`
+
+Open grafana dashboard `https://grafana.kube.com`, get admin password:
+
+```sh
+kubectl --namespace kube-prometheus-stack get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+```

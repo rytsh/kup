@@ -2,7 +2,7 @@
 
 export KIND_EXPERIMENTAL_PROVIDER=${KIND_EXPERIMENTAL_PROVIDER:-docker}
 
-sudo ip route add 10.0.10.0/24 via $(${KIND_EXPERIMENTAL_PROVIDER} inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
+sudo ip route add 10.0.10.0/24 via $(${KIND_EXPERIMENTAL_PROVIDER} inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kup-control-plane)
 
 if ${KIND_EXPERIMENTAL_PROVIDER} ps | grep -q kube-proxy; then
   ${KIND_EXPERIMENTAL_PROVIDER} restart kube-proxy

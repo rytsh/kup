@@ -17,7 +17,7 @@ helm install cilium oci://quay.io/cilium/charts/cilium  --version 1.19.0 \
   --set bpf.masquerade=true \
   --set image.pullPolicy=IfNotPresent \
   --set gatewayAPI.enabled=true \
-  --set k8sServiceHost=kind-control-plane \
+  --set k8sServiceHost=kup-control-plane \
   --set k8sServicePort=6443 \
   --set l7Proxy=true \
   --set kubeProxyReplacement=true \
@@ -33,11 +33,29 @@ cat <<EOF | kubectl apply -f -
 apiVersion: "cilium.io/v2"
 kind: CiliumLoadBalancerIPPool
 metadata:
+  name: "pool-gateway"
+spec:
+  blocks:
+  - cidr: "10.0.10.1/32"
+  serviceSelector:
+    matchExpressions:
+    - key: gateway.networking.k8s.io/gateway-name
+      operator: In
+      values: ["kube"]
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
   name: "pool"
 spec:
   blocks:
-  - start: "10.0.10.1"
-    stop: "10.0.10.100"
+  - start: "10.0.11.1"
+    stop: "10.0.11.100"
+  serviceSelector:
+    matchExpressions:
+    - key: gateway.networking.k8s.io/gateway-name
+      operator: NotIn
+      values: ["kube"]
 EOF
 
 echo "> Cilium installed successfully"

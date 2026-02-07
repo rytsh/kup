@@ -24,7 +24,7 @@ echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
 
 ## Installation
 
-> Delete the cluster with `kind delete cluster --name kube` if you want to start over.
+> Delete the cluster with `kind delete cluster` if you want to start over.
 
 Kind install a Kubernetes cluster with Cilium as the CNI plugin.
 

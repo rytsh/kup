@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #!/usr/bin/env bash
 
 ###################
@@ -15,7 +13,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 echo "> [3/10] Install prometheus stack"
-helm install kube-prometheus-stack --version \
+helm install kube-prometheus-stack \
   --create-namespace \
   --namespace kube-prometheus-stack \
   prometheus-community/kube-prometheus-stack \
@@ -30,7 +28,7 @@ helm repo add grafana https://grafana.github.io/helm-charts || true
 helm repo add grafana-community https://grafana-community.github.io/helm-charts || true
 helm repo update
 
-echo "> [8/10] Install loki-stack, tempo"
+echo "> [8/10] Install loki-stack"
 helm install loki \
   --namespace kube-prometheus-stack \
   grafana/loki \
@@ -47,16 +45,12 @@ helm install loki \
   --set write.replicas=0 \
   --set backend.replicas=0
 
+echo "> [9/10] Install tempo"
 helm install tempo \
   --namespace kube-prometheus-stack \
   grafana-community/tempo \
   --set persistence.enabled=true \
   --set persistence.size=5Gi
-
-echo "> [9/10] Install grafana"
-helm install grafana \
-  --namespace kube-prometheus-stack \
-  grafana-community/grafana
 
 echo "> [10/10] Add grafana.kube.com"
 cat <<EOF | kubectl -n kube-prometheus-stack apply -f -

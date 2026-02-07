@@ -31,8 +31,8 @@ fi
 
 cat << EOF > /mnt/c/Users/$WIN_USER/.wslconfig
 [wsl2]
-kernel = C:\\tools\\kernel\\bzImage-x64v3
-kernelModules = C:\\tools\\kernel\\bzImage-x64v3-addons.vhdx
+kernel = C:\\\\tools\\\\kernel\\\\bzImage-x64v3
+kernelModules = C:\\\\tools\\\\kernel\\\\bzImage-x64v3-addons.vhdx
 kernelCommandLine = cgroup_no_v1=all
 EOF
 

@@ -61,7 +61,13 @@ helm install loki \
   --set chunksCache.enabled=false \
   --set resultsCache.enabled=false
 
-echo "> [9/10] Install tempo"
+echo "> [9/10] Install promtail"
+helm install promtail \
+  --namespace kube-prometheus-stack \
+  grafana/promtail \
+  --set config.clients[0].url=http://loki:3100/loki/api/v1/push
+
+echo "> [10/10] Install tempo"
 helm install tempo \
   --namespace kube-prometheus-stack \
   grafana-community/tempo \

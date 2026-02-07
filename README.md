@@ -9,8 +9,6 @@ Kubernetes installation guide in WSL.
 - A Linux distribution installed in WSL
 - Kernel installed `https://github.com/Locietta/xanmod-kernel-WSL2` check `./scripts/kernel/install.sh` for installation instructions.
 
-## Installation
-
 All tools are installed in the `~/bin` directory. Make sure to add it to your PATH.
 
 ```sh
@@ -23,6 +21,10 @@ echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
 ./scripts/tools/cilium.sh
 ./scripts/tools/helm.sh
 ```
+
+## Installation
+
+> Delete the cluster with `kind delete cluster --name kube` if you want to start over.
 
 Kind install a Kubernetes cluster with Cilium as the CNI plugin.
 

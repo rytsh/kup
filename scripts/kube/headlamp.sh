@@ -26,3 +26,4 @@ spec:
 EOF
 
 echo "> Headlamp installed successfully"
+echo "> Create token with 'kubectl create token headlamp --namespace kube-system'"

@@ -11,7 +11,7 @@ metadata:
 spec:
   parentRefs:
   - name: kube
-    namespace: default
+    namespace: kube-gateway
   hostnames:
   - "headlamp.kube.com"
   rules:

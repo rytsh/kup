@@ -15,7 +15,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 echo "> [3/10] Install prometheus stack"
-helm install kube-prometheus-stack \
+helm install kube-prometheus-stack --version \
   --create-namespace \
   --namespace kube-prometheus-stack \
   prometheus-community/kube-prometheus-stack \
@@ -27,19 +27,36 @@ helm install kube-prometheus-stack \
 
 echo "> [5/10] Add grafana repo"
 helm repo add grafana https://grafana.github.io/helm-charts || true
+helm repo add grafana-community https://grafana-community.github.io/helm-charts || true
 helm repo update
 
-echo "> [8/10] Install loki-stack"
+echo "> [8/10] Install loki-stack, tempo"
 helm install loki \
   --namespace kube-prometheus-stack \
-  grafana/loki-stack
+  grafana/loki \
+  --set loki.commonConfig.replication_factor=1 \
+  --set loki.storage.type=filesystem \
+  --set loki.schemaConfig.configs[0].from="2024-01-01" \
+  --set loki.schemaConfig.configs[0].store=tsdb \
+  --set loki.schemaConfig.configs[0].object_store=filesystem \
+  --set loki.schemaConfig.configs[0].schema=v13 \
+  --set loki.schemaConfig.configs[0].index.prefix=loki_index_ \
+  --set loki.schemaConfig.configs[0].index.period=24h \
+  --set singleBinary.replicas=1 \
+  --set read.replicas=0 \
+  --set write.replicas=0 \
+  --set backend.replicas=0
 
-echo "> [9/10] Install tempo"
 helm install tempo \
   --namespace kube-prometheus-stack \
-  grafana/tempo \
+  grafana-community/tempo \
   --set persistence.enabled=true \
   --set persistence.size=5Gi
+
+echo "> [9/10] Install grafana"
+helm install grafana \
+  --namespace kube-prometheus-stack \
+  grafana-community/grafana
 
 echo "> [10/10] Add grafana.kube.com"
 cat <<EOF | kubectl -n kube-prometheus-stack apply -f -

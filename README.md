@@ -46,6 +46,8 @@ Install registry, cilium network and metric server in the cluster.
 ./scripts/kube/metrics-server.sh
 # Add cert manager in the cluster and install *.kube.com
 ./scripts/kube/cert-manager.sh
+# Add gateway for *.kube.com and kube.com
+./scripts/kube/gateway.sh
 # Add prometheus and grafana in the cluster.
 ./scripts/kube/prometheus.sh
 ```

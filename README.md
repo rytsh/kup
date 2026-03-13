@@ -50,6 +50,8 @@ Install registry, cilium network and metric server in the cluster.
 ./scripts/kube/gateway.sh
 # Add prometheus and grafana in the cluster.
 ./scripts/kube/prometheus.sh
+# Add ArgoCD in the cluster.
+./scripts/kube/argocd.sh
 ```
 
 Get CA certificate for cert-manager to trust the cluster.
@@ -88,8 +90,18 @@ Use `socks5` proxy to access the cluster.
 In browser add extension `FoxyProxy` and set proxy for `*.kube.com` to `socks5://localhost:1080`.  
 Also add proxy pattern `*://*.kube.com/`
 
+### Grafana dashboard
+
 Open grafana dashboard `https://grafana.kube.com`, get admin password:
 
 ```sh
 kubectl --namespace kube-prometheus-stack get secrets kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+```
+
+### ArgoCD dashboard
+
+Open ArgoCD dashboard `https://argocd.kube.com`, get admin password:
+
+```sh
+kubectl -n argocd get secrets argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
 ```

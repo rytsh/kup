@@ -9,12 +9,12 @@ helm repo add cilium https://helm.cilium.io/ || true
 helm repo update
 
 echo "> Install Cilium"
-helm install cilium oci://quay.io/cilium/charts/cilium  --version 1.19.0 \
+helm install cilium oci://quay.io/cilium/charts/cilium  --version 1.19.1 \
   --namespace kube-system \
   --set ipam.mode=kubernetes \
   --set socketLB.enabled=true \
   --set bpf.tproxy=true \
-  --set bpf.masquerade=true \
+  --set enableIPv4Masquerade=true \
   --set image.pullPolicy=IfNotPresent \
   --set gatewayAPI.enabled=true \
   --set k8sServiceHost=kup-control-plane \

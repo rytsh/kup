@@ -105,3 +105,25 @@ Open ArgoCD dashboard `https://argocd.kube.com`, get admin password:
 ```sh
 kubectl -n argocd get secrets argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
 ```
+
+To add gitlab repo than use personal-access-token with giving `oauth2` username.
+
+### Private registry
+
+Create docker registry secret in the cluster.
+
+```sh
+kubectl create secret docker-registry regcred \
+    --docker-server=localhost:5000 \
+    --docker-username=test \
+    --docker-password=test \
+    -n <namespace>
+```
+
+We can add to serviceaccount to use the registry secret.
+
+```sh
+kubectl patch serviceaccount default \
+  -n <namespace> \
+  -p '{"imagePullSecrets": [{"name": "regcred"}]}'
+```

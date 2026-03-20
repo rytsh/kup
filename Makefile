@@ -10,6 +10,7 @@ create: ## Initialize the project
 	./scripts/kube/cert-manager.sh
 	./scripts/kube/gateway.sh
 	./scripts/kube/argocd.sh
+	./scripts/kube/external.sh
 
 .PHONY: registry
 registry: ## Add local registry

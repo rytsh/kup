@@ -52,6 +52,8 @@ Install registry, cilium network and metric server in the cluster.
 ./scripts/kube/prometheus.sh
 # Add ArgoCD in the cluster.
 ./scripts/kube/argocd.sh
+# Add external secret CRD
+./scripts/kube/external.sh
 ```
 
 Get CA certificate for cert-manager to trust the cluster.

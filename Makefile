@@ -37,6 +37,10 @@ pika: ## Add pika configuration
 socks5: ## Add socks5 configuration
 	./scripts/proxy/socks5.sh
 
+.PHONY: argocd-secret
+argocd-secret: ## Add argocd secret
+	kubectl -n argocd get secrets argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
+
 .PHONY: help
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

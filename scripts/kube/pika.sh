@@ -12,7 +12,7 @@ resources:
 
 images:
   - name: ghcr.io/rakunlabs/pika
-    newTag: v0.1.2
+    newTag: v0.1.3
 
 patches:
   - target:
@@ -29,5 +29,21 @@ patches:
             namespace: kube-gateway
 EOF
 kubectl apply -k "$TMPDIR" -n pika && rm -rf "$TMPDIR"
+
+
+cat <<EOF | kubectl apply -n pika -f -
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: pika
+spec:
+  provider:
+    webhook:
+      url: "http://pika.pika.svc:9090/data/{{ .remoteRef.key }}"
+      result:
+        jsonPath: "$"
+      headers:
+        Accept: application/octet-stream
+EOF
 
 echo "> Pika installed successfully"

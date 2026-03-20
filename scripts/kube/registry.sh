@@ -61,6 +61,7 @@ select_auth_registries() {
 
   # Build AUTH_REGISTRIES string: "registry:username:password"
   local auth_entries=()
+  local selected_hosts=()
   for reg in "${selected[@]}"; do
     local auth_b64
     auth_b64=$(jq -r --arg reg "$reg" '.auths[$reg].auth // empty' "$DOCKER_CONFIG" 2>/dev/null)
@@ -76,6 +77,7 @@ select_auth_registries() {
       host="${host#http://}"
       host="${host%%/*}"
       auth_entries+=("${host}:${username}:${password}")
+      selected_hosts+=("$host")
       echo "> Added auth for $host"
     else
       echo "> No credentials found for $reg (may use credential helper)"
@@ -86,6 +88,10 @@ select_auth_registries() {
     AUTH_REGISTRIES=$(printf "%s " "${auth_entries[@]}")
     AUTH_REGISTRIES="${AUTH_REGISTRIES% }"
     export AUTH_REGISTRIES
+
+    EXTRA_REGISTRIES=$(printf "%s " "${selected_hosts[@]}")
+    EXTRA_REGISTRIES="${EXTRA_REGISTRIES% }"
+    export EXTRA_REGISTRIES
   fi
 }
 
@@ -108,7 +114,7 @@ else
     -p 0.0.0.0:3128:3128 \
     -v /opt/registry/docker_mirror_cache:/docker_mirror_cache \
     -v /opt/registry/docker_mirror_certs:/ca \
-    -e REGISTRIES="${DEFAULT_REGISTRIES}" \
+    -e REGISTRIES="${DEFAULT_REGISTRIES} ${EXTRA_REGISTRIES}" \
     "${AUTH_ENV[@]}" \
     rpardini/docker-registry-proxy:0.6.5
   echo "> Waiting for registry container to start 10s"

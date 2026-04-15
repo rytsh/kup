@@ -1,3 +1,5 @@
+KIND_CLUSTER_NAME := kup
+
 .DEFAULT_GOAL := help
 
 .PHONY: create
@@ -23,10 +25,14 @@ registry: ## Add local registry
 	docker rm -f docker_registry_proxy || true
 	./scripts/kube/registry.sh
 
-.PHONE: delete
+.PHONY: push-registry
+push-registry: ## Push images to kind registry
+	kind load docker-image ${IMAGE} --name ${KIND_CLUSTER_NAME}
+
+.PHONY: delete
 delete: ## Delete the cluster
 	@echo "Deleting cluster..."
-	kind delete cluster -n kup
+	kind delete cluster -n ${KIND_CLUSTER_NAME}
 
 .PHONY: ca
 ca: ## Get CA file in the ./tmp/ca.crt; chrome://certificate-manager/localcerts/usercerts

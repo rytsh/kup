@@ -9,7 +9,13 @@ create: ## Initialize the project
 	./scripts/kube/metrics-server.sh
 	./scripts/kube/cert-manager.sh
 	./scripts/kube/gateway.sh
+
+.PHONY: argocd
+argocd: ## Add argocd configuration
 	./scripts/kube/argocd.sh
+
+.PHONY: external
+external: ## Add external configuration
 	./scripts/kube/external.sh
 
 .PHONY: registry

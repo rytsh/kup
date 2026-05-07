@@ -3,7 +3,7 @@ KIND_CLUSTER_NAME := kup
 .DEFAULT_GOAL := help
 
 .PHONY: create
-create: ## Initialize the project
+create: ## Initialize the project with registry, cilium, metrics-server, cert-manager and gateway
 	@echo "Initializing project..."
 	kind create cluster --config=configs/kind.yaml
 	./scripts/kube/registry.sh
@@ -12,21 +12,17 @@ create: ## Initialize the project
 	./scripts/kube/cert-manager.sh
 	./scripts/kube/gateway.sh
 
-.PHONY: argocd
-argocd: ## Add argocd configuration
-	./scripts/kube/argocd.sh
-
 .PHONY: external
-external: ## Add external configuration
+external: ## Add external configuration crds
 	./scripts/kube/external.sh
 
 .PHONY: registry
-registry: ## Add local registry
+registry: ## Add local registry for cleanup and re-creation
 	docker rm -f docker_registry_proxy || true
 	./scripts/kube/registry.sh
 
 .PHONY: push-registry
-push-registry: ## Push images to kind registry
+push-registry: ## Push images to kind registry use with IMAGE=your-image:tag
 	kind load docker-image ${IMAGE} --name ${KIND_CLUSTER_NAME}
 
 .PHONY: delete
@@ -38,6 +34,10 @@ delete: ## Delete the cluster
 ca: ## Get CA file in the ./tmp/ca.crt; chrome://certificate-manager/localcerts/usercerts
 	kubectl -n kube-gateway get secrets ca -o jsonpath='{.data.tls\.crt}' | base64 -d > ./tmp/ca.crt
 
+.PHONY: socks5
+socks5: ## Add socks5 configuration
+	./scripts/proxy/socks5.sh
+
 .PHONY: prometheus
 prometheus: ## Add metrics/trace/logging
 	./scripts/kube/prometheus.sh
@@ -46,9 +46,9 @@ prometheus: ## Add metrics/trace/logging
 pika: ## Add pika configuration
 	./scripts/kube/pika.sh
 
-.PHONY: socks5
-socks5: ## Add socks5 configuration
-	./scripts/proxy/socks5.sh
+.PHONY: argocd
+argocd: ## Add argocd configuration
+	./scripts/kube/argocd.sh
 
 .PHONY: argocd-secret
 argocd-secret: ## Add argocd secret

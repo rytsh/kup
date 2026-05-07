@@ -12,24 +12,34 @@ resources:
 
 images:
   - name: ghcr.io/rakunlabs/pika
-    newTag: v0.1.3
-
-patches:
-  - target:
-      kind: HTTPRoute
-      name: pika
-    patch: |
-      - op: replace
-        path: /spec/hostnames/0
-        value: pika.kube.com
-      - op: replace
-        path: /spec/parentRefs
-        value:
-          - name: kube
-            namespace: kube-gateway
+    newTag: latest
 EOF
 kubectl apply -k "$TMPDIR" -n pika && rm -rf "$TMPDIR"
 
+cat <<EOF | kubectl apply -n pika -f -
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pika
+spec:
+  parentRefs:
+    - name: kube
+      namespace: kube-gateway
+  hostnames:
+    - "pika.kube.com"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: pika
+          port: 8080
+EOF
+
+echo "> Wait for external-secrets webhook to be ready"
+kubectl -n external-secrets rollout status deployment/external-secrets-webhook --timeout=5m
+kubectl -n external-secrets wait --for=condition=Available deployment/external-secrets-webhook --timeout=5m
 
 cat <<EOF | kubectl apply -n pika -f -
 apiVersion: external-secrets.io/v1
